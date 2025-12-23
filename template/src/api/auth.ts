@@ -20,13 +20,13 @@ export const loginUser = async (email: string, password: string): Promise<LoginR
       // ✅ Store the token in localStorage
       localStorage.setItem("token", data.token);
        localStorage.setItem("user", JSON.stringify(data.user));
-      console.log("✅ Token saved to localStorage:", data.token);
+      console.log("✅ Token saved to localStorage: - auth.ts:23", data.token);
     } else {
-      console.warn("⚠️ Login failed:", data.message || "Invalid credentials");
+      console.warn("⚠️ Login failed: - auth.ts:25", data.message || "Invalid credentials");
     }
     return data;
   } catch (error) {
-    console.error("Login error:", error);
+    console.error("Login error: - auth.ts:29", error);
     return { message: "Server error. Please try again." };
   }
 };

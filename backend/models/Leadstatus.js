@@ -11,7 +11,4 @@ const leadstatusSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
-
 module.exports= mongoose.model("Leadstatus", leadstatusSchema);
-

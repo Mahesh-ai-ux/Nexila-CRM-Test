@@ -1,4 +1,3 @@
-
 const Leadstatus = require("../models/Leadstatus.js");
 // ✅ Create Lead Status
 exports.createLeadStatus = async (req, res) => {
@@ -73,4 +72,3 @@ exports.deleteLeadStatus = async (req, res) => {
     return res.status(500).json({ msg: "Server error" });
   }
 };
-

@@ -8,10 +8,15 @@ const axios = require("axios");
 // ✅ Create Lead
 exports.createLead = async (req, res) => {
   try {
-    console.log("📥 Creating Lead: - leadController.js:11", req.body);
+    console.log("📥 Creating Lead:", req.body);
+     //  FIX: define data FIRST
+    const data = { ...req.body };
 
+    //  Convert empty strings to null (ObjectId safety)
+    if (!data.assignfrom || data.assignfrom === "") data.assignfrom = null;
+    if (!data.assignto || data.assignto === "") data.assignto = null;
     const newLead = new Lead({
-      ...req.body,
+      ...data,
       createdBy: req.user ? req.user._id : null, 
       // store creator if authenticated
     });
@@ -54,11 +59,11 @@ exports.createLead = async (req, res) => {
       }
     )
     .then(res => {
-        console.log("✅ WATI OK - leadController.js:57", res.data);
+        console.log("✅ WATI OK", res.data);
       })
       .catch(err => {
-        console.log("❌ STATUS: - leadController.js:60", err.response?.status);
-        console.log("❌ DATA: - leadController.js:61", err.response?.data);
+        console.log("❌ STATUS:", err.response?.status);
+        console.log("❌ DATA:", err.response?.data);
       });
 //     axios.post( "https://live-server-1020387.wati.io/api/v2/sendTemplateMessage" +
 //   "?whatsappNumber=919360228893",
@@ -91,7 +96,7 @@ exports.createLead = async (req, res) => {
     });
 
   } catch (err) {
-    console.error("❌ Error creating lead: - leadController.js:94", err.response?.data || err.message);
+    console.error("❌ Error creating lead:", err.response?.data || err.message);
     res.status(500).json({
       success: false,
       message: "Lead created but WhatsApp failed",
@@ -128,7 +133,7 @@ exports.listLeads = async (req, res) => {
       leads,
     });
   } catch (err) {
-    console.error("❌ Error fetching leads: - leadController.js:131", err.message);
+    console.error("❌ Error fetching leads:", err.message);
     res.status(500).json({ success: false, message: err.message });
   }
 };
@@ -147,7 +152,7 @@ exports.getLead = async (req, res) => {
 
     res.status(200).json({ success: true, lead });
   } catch (err) {
-    console.error("❌ Error fetching lead: - leadController.js:150", err.message);
+    console.error("❌ Error fetching lead:", err.message);
     res.status(500).json({ success: false, message: err.message });
   }
 };
@@ -157,8 +162,8 @@ exports.updateLead = async (req, res) => {
   try {
     const { id } = req.params;
 
-    console.log("✏️ Updating lead with ID: - leadController.js:160", id);
-    console.log("📦 Incoming data: - leadController.js:161", req.body);
+    console.log("✏️ Updating lead with ID:", id);
+    console.log("📦 Incoming data:", req.body);
 
     // 1️⃣ Convert names → ObjectId
     if (req.body.assignfrom && typeof req.body.assignfrom === "string") {
@@ -185,7 +190,7 @@ exports.updateLead = async (req, res) => {
       return res.status(404).json({ success: false, message: "Lead not found" });
     }
 
-    console.log("✅ Lead updated: - leadController.js:188", updatedLead);
+    console.log("✅ Lead updated:", updatedLead);
 
     // ------------------------------------------------------------------
     // 3️⃣ SYNC changes to Deal (if exists)
@@ -213,7 +218,7 @@ exports.updateLead = async (req, res) => {
         { new: true }
       );
 
-      console.log("🔄 Deal synced with updated lead - leadController.js:216");
+      console.log("🔄 Deal synced with updated lead");
     }
 
     // ------------------------------------------------------------------
@@ -241,7 +246,7 @@ exports.updateLead = async (req, res) => {
         { new: true }
       );
 
-      console.log("🔄 Student synced with updated lead - leadController.js:244");
+      console.log("🔄 Student synced with updated lead");
     }
 
     // ------------------------------------------------------------------
@@ -255,7 +260,7 @@ exports.updateLead = async (req, res) => {
         demodate: updatedLead.demodate,
       });
 
-      console.log("📦 New Deal created - leadController.js:258");
+      console.log("📦 New Deal created");
     }
 
     // ------------------------------------------------------------------
@@ -269,7 +274,7 @@ exports.updateLead = async (req, res) => {
         demodate: updatedLead.demodate,
       });
 
-      console.log("🎓 New Student created - leadController.js:272");
+      console.log("🎓 New Student created");
     }
      //  2️⃣ Prepare WhatsApp Number
     let phone = updatedLead.phone; // 🔴 make sure this field exists
@@ -307,11 +312,11 @@ exports.updateLead = async (req, res) => {
       }
     )
     .then(res => {
-        console.log("✅ WATI OK - leadController.js:310", res.data);
+        console.log("✅ WATI OK", res.data);
       })
       .catch(err => {
-        console.log("❌ STATUS: - leadController.js:313", err.response?.status);
-        console.log("❌ DATA: - leadController.js:314", err.response?.data);
+        console.log("❌ STATUS:", err.response?.status);
+        console.log("❌ DATA:", err.response?.data);
       });
     // ------------------------------------------------------------------
     // 7️⃣ Send Response
@@ -323,7 +328,7 @@ exports.updateLead = async (req, res) => {
     });
     
   } catch (err) {
-    console.error("❌ Error updating lead: - leadController.js:326", err);
+    console.error("❌ Error updating lead:", err);
     return res.status(500).json({
       success: false,
       message: "Server error",
@@ -344,7 +349,7 @@ exports.deleteLead = async (req, res) => {
     await Lead.findByIdAndDelete(id);
     res.status(200).json({ success: true, message: "Lead deleted successfully" });
   } catch (err) {
-    console.error("❌ Error deleting lead: - leadController.js:347", err.message);
+    console.error("❌ Error deleting lead:", err.message);
     res.status(500).json({ success: false, message: err.message });
   }
 };
@@ -361,7 +366,7 @@ exports.recentLeads = async (req, res) => {
 
     res.status(200).json({ success: true, leads });
   } catch (err) {
-    console.error("❌ Error fetching recent leads: - leadController.js:364", err.message);
+    console.error("❌ Error fetching recent leads:", err.message);
     res.status(500).json({ success: false, message: err.message });
   }
 };

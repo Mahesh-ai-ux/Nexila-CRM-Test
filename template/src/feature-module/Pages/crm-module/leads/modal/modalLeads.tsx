@@ -4,18 +4,14 @@ import {
   Assign_From,
   Assign_To,
   Categorys,
- 
   Currency,
-
   Industry,
-
   Leadstatus,
- 
   Source,
- 
+  Lookingfor,
+  Internshipduration,
 } from "../../../../../core/json/selectOption";
 import CommonSelect from "../../../../../components/common-select/commonSelect";
-// import ImageWithBasePath from "../../../../../components/imageWithBasePath";
 import CommonDatePicker from "../../../../../components/common-datePicker/commonDatePicker";
 import { useState,useEffect} from "react";
 import { createLead } from "../../../../../api/leadApi";
@@ -40,18 +36,19 @@ interface Lead {
   graduate?: string;
   followdate?:string;
   demodate?:string;
+  lookingfor?:string;
+  internshipduration?:string;
 }
 
 interface ModalLeadsProps {
-  
-  selectedLead?: Lead | null;
-  actionType?: "edit" | "delete" | null;
-  onUpdate?: () => void;
+  selectedLead: Lead | null;
+  actionType: "edit" | "delete" | null;
+  onUpdate: () => void;
 }
 const ModalLeads: React.FC<ModalLeadsProps> = ({
-  selectedLead = null,
+  selectedLead,
   actionType: _actionType = "",
-  onUpdate = async () => {},
+  onUpdate,
 }) => {
 
   // const [selectedItems, setSelectedItems] = useState<string[]>([]);
@@ -122,6 +119,8 @@ const ModalLeads: React.FC<ModalLeadsProps> = ({
     graduate: "",
     followdate: "",
     demodate: "",
+    lookingfor:"",
+    internshipduration:"",
   });
   const [userList, setUserList] = useState<any[]>([]); 
 
@@ -141,7 +140,9 @@ const [formData, setFormData] = useState<Lead>({
     assignto: "",
     graduate: "",
     followdate: "",
-    demodate: ""
+    demodate: "",
+    lookingfor:"",
+    internshipduration:"",
   });
   //Leadstaus option getting
 useEffect(() => {
@@ -182,10 +183,8 @@ useEffect(() => {
 
       console.log("Fetched users:", res.data);
       const formatted = res.data.map((u: any) => ({
-         label: `${u.name} `,
-         value: u._id,
-        //  label: u.name,
-         // value: u.name,
+        label: `${u.name} `,
+        value: u._id,
       }));
       setUserList(formatted);
     } catch (err: any) {
@@ -199,8 +198,21 @@ useEffect(() => {
 
 
   // ✅ Validate fields
-  const validateForm = () => {
-  const fieldsToIgnore = ["demodate", "followdate"];
+ const validateForm = () => {
+  // Always optional fields
+  const alwaysIgnore = ["demodate", "followdate", "internshipduration"];
+
+  // Conditional logic
+  const isAssignmentRequired =
+    formData.leadstatus === "Demo Scheduled" ||
+    formData.leadstatus === "Student";
+
+  // Conditionally ignore assign fields
+  const conditionalIgnore = isAssignmentRequired
+    ? [] // BOTH required
+    : ["assignto", "assignfrom"]; // BOTH optional
+
+  const fieldsToIgnore = [...alwaysIgnore, ...conditionalIgnore];
 
   const emptyFields = Object.entries(formData).filter(
     ([key, value]) =>
@@ -215,6 +227,7 @@ useEffect(() => {
 
   return true;
 };
+
   // ✅ Handle text inputs
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -265,6 +278,8 @@ const handleSubmit = async (e: React.FormEvent) => {
         graduate: "",
         followdate:"",
         demodate:"",
+        lookingfor:"",
+        internshipduration:"",
       
         
       });
@@ -364,246 +379,7 @@ const handleDelete = async () => {
 };
 
 
-//   const options = [
-//     {
-//       label: (
-//         <div className="d-flex align-items-center gap-2">
-//           <div
-//             style={{
-//               borderRadius: "50%",
-//               overflow: "hidden",
-//               width: 24,
-//               height: 24,
-//             }}
-//           >
-//             <ImageWithBasePath
-//               src="assets/img/profiles/avatar-02.jpg"
-//               alt="Robert"
-//               width={24}
-//               height={24}
-//             />
-//           </div>
-//           Robert Johnson
-//         </div>
-//       ),
-//       value: "robert-johnson",
-//     },
-//     {
-//       label: (
-//         <div className="d-flex align-items-center gap-2">
-//           <div
-//             style={{
-//               borderRadius: "50%",
-//               overflow: "hidden",
-//               width: 24,
-//               height: 24,
-//             }}
-//           >
-//             <ImageWithBasePath
-//               src="assets/img/users/user-01.jpg"
-//               alt="Sharon"
-//               width={24}
-//               height={24}
-//             />
-//           </div>
-//           Sharon Roy
-//         </div>
-//       ),
-//       value: "sharon-roy",
-//     },
-//     {
-//       label: (
-//         <div className="d-flex align-items-center gap-2">
-//           <div
-//             style={{
-//               borderRadius: "50%",
-//               overflow: "hidden",
-//               width: 24,
-//               height: 24,
-//             }}
-//           >
-//             <ImageWithBasePath
-//               src="assets/img/profiles/avatar-21.jpg"
-//               alt="Vaughan"
-//               width={24}
-//               height={24}
-//             />
-//           </div>
-//           Vaughan Lewis
-//         </div>
-//       ),
-//       value: "vaughan-lewis",
-//     },
-//     {
-//       label: (
-//         <div className="d-flex align-items-center gap-2">
-//           <div
-//             style={{
-//               borderRadius: "50%",
-//               overflow: "hidden",
-//               width: 24,
-//               height: 24,
-//             }}
-//           >
-//             <ImageWithBasePath
-//               src="assets/img/profiles/avatar-23.jpg"
-//               alt="Jessica"
-//               width={24}
-//               height={24}
-//             />
-//           </div>
-//           Jessica Louise
-//         </div>
-//       ),
-//       value: "jessica-louise",
-//     },
-//     {
-//       label: (
-//         <div className="d-flex align-items-center gap-2">
-//           <div
-//             style={{
-//               borderRadius: "50%",
-//               overflow: "hidden",
-//               width: 24,
-//               height: 24,
-//             }}
-//           >
-//             <ImageWithBasePath
-//               src="assets/img/profiles/avatar-16.jpg"
-//               alt="Carol"
-//               width={24}
-//               height={24}
-//             />
-//           </div>
-//           Carol Thomas
-//         </div>
-//       ),
-//       value: "carol-thomas",
-//     },
-//   ];
 
-//    const [selectedItems2, setSelectedItems2] = useState<string[]>([]);
-
-//   const handleChange2 = (value: string[]) => {
-//     setSelectedItems2(value);
-//   };
-//  const options2 = [
-//     {
-//       label: (
-//         <div className="d-flex align-items-center gap-2">
-//           <div
-//             style={{
-//               borderRadius: "50%",
-//               overflow: "hidden",
-//               width: 24,
-//               height: 24,
-//             }}
-//           >
-//             <ImageWithBasePath
-//               src="assets/img/profiles/avatar-19.jpg"
-//               alt="Robert"
-//               width={24}
-//               height={24}
-//             />
-//           </div>
-//          Darlee Robertson
-//         </div>
-//       ),
-//       value: "robert-johnson",
-//     },
-//     {
-//       label: (
-//         <div className="d-flex align-items-center gap-2">
-//           <div
-//             style={{
-//               borderRadius: "50%",
-//               overflow: "hidden",
-//               width: 24,
-//               height: 24,
-//             }}
-//           >
-//             <ImageWithBasePath
-//               src="assets/img/users/user-01.jpg"
-//               alt="Sharon"
-//               width={24}
-//               height={24}
-//             />
-//           </div>
-//           Sharon Roy
-//         </div>
-//       ),
-//       value: "sharon-roy",
-//     },
-//     {
-//       label: (
-//         <div className="d-flex align-items-center gap-2">
-//           <div
-//             style={{
-//               borderRadius: "50%",
-//               overflow: "hidden",
-//               width: 24,
-//               height: 24,
-//             }}
-//           >
-//             <ImageWithBasePath
-//               src="assets/img/profiles/avatar-21.jpg"
-//               alt="Vaughan"
-//               width={24}
-//               height={24}
-//             />
-//           </div>
-//           Vaughan Lewis
-//         </div>
-//       ),
-//       value: "vaughan-lewis",
-//     },
-//     {
-//       label: (
-//         <div className="d-flex align-items-center gap-2">
-//           <div
-//             style={{
-//               borderRadius: "50%",
-  //             overflow: "hidden",
-  //             width: 24,
-  //             height: 24,
-  //           }}
-  //         >
-  //           <ImageWithBasePath
-  //             src="assets/img/profiles/avatar-23.jpg"
-  //             alt="Jessica"
-  //             width={24}
-  //             height={24}
-  //           />
-  //         </div>
-  //         Jessica Louise
-  //       </div>
-  //     ),
-  //     value: "jessica-louise",
-  //   },
-  //   {
-  //     label: (
-  //       <div className="d-flex align-items-center gap-2">
-  //         <div
-  //           style={{
-  //             borderRadius: "50%",
-  //             overflow: "hidden",
-  //             width: 24,
-  //             height: 24,
-  //           }}
-  //         >
-  //           <ImageWithBasePath
-  //             src="assets/img/profiles/avatar-16.jpg"
-  //             alt="Carol"
-  //             width={24}
-  //             height={24}
-  //           />
-  //         </div>
-  //         Carol Thomas
-  //       </div>
-  //     ),
-  //     value: "carol-thomas",
-  //   },
-  // ];
 
   // const [tags, setTags] = useState<string[]>(["Collab"]);
   // const handleTagsChange = (newTags: string[]) => {
@@ -797,38 +573,6 @@ const handleDelete = async () => {
                   />
                 </div>
               </div>
-              
-              
-               <div className="col-md-6">
-                <div className="mb-3">
-                    <label className="form-label">
-                  Assign From <span className="text-danger">*</span> 
-                  </label>
-                  <CommonSelect
-                  name="assignfrom"
-                   value={formData.assignfrom}
-                    onChange={handleSelectChange}
-                    options={userList}
-                    className="select"
-                    defaultValue={Assign_From[0]}
-                  />
-                </div>
-              </div>
-               <div className="col-md-6">
-                <div className="mb-3">
-                    <label className="form-label">
-                  Assign To<span className="text-danger">*</span> 
-                  </label>
-                  <CommonSelect
-                  name="assignto"
-                   value={formData.assignto}
-                    onChange={handleSelectChange}
-                    options={userList}
-                    className="select"
-                    defaultValue={Assign_To[0]}
-                  />
-                </div>
-              </div>
               <div className="col-md-6">
                 <div className="mb-3">
                    <div className="d-flex align-items-center justify-content-between">
@@ -858,15 +602,50 @@ const handleDelete = async () => {
                <div className="col-md-6">
                 <div className="mb-3">
                   <label className="form-label">
+                    Program Looking For <span className="text-danger">*</span>
+                  </label>
+                  <CommonSelect
+                  name="lookingfor"
+                   value={formData.lookingfor}
+                    onChange={handleSelectChange}
+                    options={Lookingfor}
+                    className="select"
+                    defaultValue={Lookingfor[0]}
+                  />
+                </div>
+              </div>
+               <div className="col-md-6">
+                <div className="mb-3">
+                  <label className="form-label">
                     Location<span className="text-danger">*</span>
                   </label>
                 <input type="text" name="location" placeholder="location" value={formData.location} onChange={handleInputChange} className="form-control" required/>
                 </div>
               </div>
-              <div className="col-md-6">
+                 {(formData.lookingfor === "Project with Internship" ||
+                formData.lookingfor === "Internship") && (
+                <div className="col-md-6">
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Internship Duration <span className="text-danger">*</span>
+                    </label>
+              
+                    <CommonSelect
+                      name="internshipduration"
+                      value={formData.internshipduration}
+                      onChange={handleSelectChange}
+                      options={Internshipduration}
+                      className="select"
+                    />
+                  </div>
+                </div>
+              )}
+                {(formData.leadstatus === "Demo Scheduled" ||
+                formData.leadstatus === "Student") && (
+                   <div className="col-md-6">
             <div className="mb-3">
               <label className="form-label">
-                Follow-UP Date
+                Follow-UP Date <span className="text-danger">*</span>
               </label>
               <div className="input-group w-auto input-group-flat">
                 <CommonDatePicker
@@ -884,10 +663,52 @@ const handleDelete = async () => {
               </div>
             </div>
           </div>
-          <div className="col-md-6">
+              )}
+                {(formData.leadstatus === "Demo Scheduled" ||
+                formData.leadstatus === "Student") && (
+                   <div className="col-md-6">
+                <div className="mb-3">
+                    <label className="form-label">
+                  Assign From <span className="text-danger">*</span> 
+                  </label>
+                  <CommonSelect
+                  name="assignfrom"
+                   value={formData.assignfrom}
+                    onChange={handleSelectChange}
+                    options={userList}
+                    className="select"
+                    defaultValue={Assign_From[0]}
+                  />
+                </div>
+              </div>
+               
+              )}
+               {(formData.leadstatus === "Demo Scheduled" ||
+                formData.leadstatus === "Student") && (
+                 <div className="col-md-6">
+                <div className="mb-3">
+                    <label className="form-label">
+                  Assign To<span className="text-danger">*</span> 
+                  </label>
+                  <CommonSelect
+                  name="assignto"
+                   value={formData.assignto}
+                    onChange={handleSelectChange}
+                    options={userList}
+                    className="select"
+                    defaultValue={Assign_To[0]}
+                  />
+                </div>
+              </div>
+              )}
+             
+               
+                 
+              
+          {/* <div className="col-md-6">
             <div className="mb-3">
               <label className="form-label">
-                Demo Date 
+                Demo Date <span className="text-danger">*</span>
               </label>
               <div className="input-group w-auto input-group-flat">
                 <CommonDatePicker
@@ -904,7 +725,7 @@ const handleDelete = async () => {
 
               </div>
             </div>
-          </div>
+          </div> */}
               
              <div className="col-md-6">
         {/* <div className="mb-3">
@@ -1259,6 +1080,48 @@ const handleDelete = async () => {
                   />
                 </div>
               </div>
+              
+              <div className="col-md-6">
+                <div className="mb-3">
+                    <label className="form-label">
+                  Program Looking For <span className="text-danger">*</span> 
+                  </label>
+                  <CommonSelect
+                  name="category"
+                    value={lead.lookingfor || ""}
+                    onChange={handleselectchange}
+                    options={Lookingfor}
+                    className="select"
+                    
+                  />
+                </div>
+              </div>
+              <div className="col-md-6">
+                <div className="mb-3">
+                   <div className="d-flex align-items-center justify-content-between">
+            <label className="form-label">
+              Lead Status <span className="text-danger">*</span>
+            </label>
+                  {/* <Link
+              to="#"
+              className="label-add link-primary"
+              data-bs-toggle="offcanvas"
+              data-bs-target="#offcanvas_pipeline"
+            >
+              <i className="ti ti-plus me-1" />
+              Add New
+            </Link> */}
+            </div>
+                  <CommonSelect
+                  name="leadstatus"
+                   value={formData.leadstatus}
+                    onChange={handleSelectChange}
+                     options={leadStatusOptions} 
+                    className="select"
+                    defaultValue={Leadstatus[0]}
+                  />
+                </div>
+              </div>
               <div className="col-md-6">
                 <div className="mb-3">
                   <label className="form-label">
@@ -1290,15 +1153,7 @@ const handleDelete = async () => {
                   />
                 </div>
               </div>
-               <div className="col-md-6">
-                <div className="mb-3">
-                  <label className="form-label">
-                    Location<span className="text-danger">*</span>
-                  </label>
-                <input type="text" name="location" value={lead.location || ""}
-                onChange={handlechange} className="form-control" required/>
-                </div>
-              </div>
+              
                   <div className="col-md-6">
             <div className="mb-3">
               <label className="form-label">
@@ -1371,6 +1226,7 @@ const handleDelete = async () => {
                   />
                 </div>
               </div> 
+              
             </div>
             <div className="d-flex align-items-center justify-content-end">
               <button

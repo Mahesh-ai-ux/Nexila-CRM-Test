@@ -28,6 +28,7 @@ demodate: {
     },
     joinstatus:{type:String},
     lookingfor:{type:String},
+    internshipduration:{type:String},
 
 
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
@@ -36,3 +37,4 @@ demodate: {
 }, { timestamps: true });
 
 module.exports= mongoose.model('Lead', LeadSchema);
+

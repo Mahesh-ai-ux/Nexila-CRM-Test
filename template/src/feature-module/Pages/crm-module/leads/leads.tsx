@@ -2,7 +2,7 @@
 // import Footer from "../../../../components/footer/footer"
 // import PageHeader from "../../../../components/page-header/pageHeader"
 // import { all_routes } from "../../../../routes/all_routes"
-// import { useState } from "react";
+ import { useState } from "react";
 // import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import ModalLeads from "./modal/modalLeads";
 // import ImageWithBasePath from "../../../../components/imageWithBasePath";
@@ -34,6 +34,17 @@ export interface ModalLeadsProps {
 }
 
 const Leads = () => {
+// Stub types
+type LeadType = any;
+
+// Dummy state (ignore unused warning)
+const [selectedLead, _setSelectedLead] = useState<LeadType | null>(null);
+const [actionType, _setActionType] = useState<"delete" | "edit" | null>(null);
+// Dummy handleUpdate function
+const handleUpdate = (_updatedLead: LeadType) => {
+  // do nothing
+};
+
    
   // ...existing code...
 
@@ -1068,10 +1079,12 @@ const Leads = () => {
   {/* ========================
 			End Page Content
 		========================= */}
-    <ModalLeads
-    // actionType={actionType}
-        />
-</>
+      <ModalLeads 
+  selectedLead={selectedLead} 
+  actionType={actionType} 
+  onUpdate={() => handleUpdate(selectedLead!)} 
+/>
+    </>
 
   )
 }
